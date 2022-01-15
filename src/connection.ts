@@ -97,7 +97,11 @@ export class Connection {
             this.respond(data, true, result);
           }
         } catch (err) {
-          this.respond(data, false, String(err));
+          this.respond(
+            data,
+            false,
+            err instanceof Error ? err.message : String(err),
+          );
         }
       }
     } else if (isResponse(data)) {
