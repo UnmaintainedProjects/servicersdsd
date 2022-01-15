@@ -7,7 +7,7 @@
     "build": "tsc",
     "test": "tsc --noEmit"
   },
-  "author": "Roj Serbest <ez@roj.im>",
+  "author": "Roj <ez@roj.im>",
   "license": "LGPL-3.0-or-later",
   "dependencies": {
     "tgcalls-next": "^0.0.0-rc.4"
