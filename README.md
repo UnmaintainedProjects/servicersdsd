@@ -1,5 +1,7 @@
 # gotgcalls-server
 
-This is the core of [GoTGCalls](https://github.com/gotgcalls/gotgcalls).
+## Installation
 
-Please visit [GoTGCalls](https://github.com/gotgcalls/gotgcalls).
+```bash
+npm install gotgcalls-server -g
+```
