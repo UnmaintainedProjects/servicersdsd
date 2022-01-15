@@ -10,7 +10,7 @@
   "author": "Roj Serbest <ez@roj.im>",
   "license": "LGPL-3.0-or-later",
   "dependencies": {
-    "tgcalls-next": "^0.0.0-rc.3"
+    "tgcalls-next": "^0.0.0-rc.4"
   },
   "devDependencies": {
     "@types/node": "^17.0.8",
