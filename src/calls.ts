@@ -27,8 +27,8 @@ export class Calls {
       instance.stream.setReadable(readable);
     } else {
       const tgcalls = new BaseTGCalls(null);
-      tgcalls.joinVoiceCall = (params) =>
-        this.connection.dispatch("joinCall", params);
+      tgcalls.joinVoiceCall = (payload) =>
+        this.connection.dispatch("joinCall", { chatId, payload });
       const stream = new Stream(readable);
       stream.on("finish", () => {
         this.connection.dispatch("finish", { chatId });
