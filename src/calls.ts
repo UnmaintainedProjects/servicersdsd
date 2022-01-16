@@ -20,7 +20,7 @@ export class Calls {
 
   constructor(private connection: Connection) {}
 
-  stream(chatId: number, file: string) {
+  stream(chatId: number, isChat: boolean, file: string, accessHash?: number) {
     const readable = createReadStream(file);
     const instance = this.instances.get(chatId);
     if (instance) {
@@ -30,7 +30,12 @@ export class Calls {
       const tgcalls = new BaseTGCalls(null);
       tgcalls.joinVoiceCall = async (payload) =>
         JSON.parse(
-          await this.connection.dispatch("joinCall", { chatId, payload }),
+          await this.connection.dispatch("joinCall", {
+            chatId,
+            isChat,
+            accessHash,
+            payload,
+          }),
         );
       const stream = new Stream(readable);
       stream.on("finish", () => {
