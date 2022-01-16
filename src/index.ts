@@ -18,12 +18,12 @@ connection.handle("stream", async ({ params }) => {
   return true;
 });
 
-connection.handle("mute", ({ params: { chatId } }) => calls.mute(chatId));
+connection.handle("mute", ({ params: { id } }) => calls.mute(id));
 
-connection.handle("unmute", ({ params: { chatId } }) => calls.unmute(chatId));
+connection.handle("unmute", ({ params: { id } }) => calls.unmute(id));
 
-connection.handle("pause", ({ params: { chatId } }) => calls.pause(chatId));
+connection.handle("pause", ({ params: { id } }) => calls.pause(id));
 
-connection.handle("resume", ({ params: { chatId } }) => calls.resume(chatId));
+connection.handle("resume", ({ params: { id } }) => calls.resume(id));
 
-connection.handle("stop", ({ params: { chatId } }) => calls.stop(chatId));
+connection.handle("stop", ({ params: { id } }) => calls.stop(id));
