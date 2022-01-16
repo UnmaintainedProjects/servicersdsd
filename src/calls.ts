@@ -28,15 +28,21 @@ export class Calls {
       instance.stream.setReadable(readable);
     } else {
       const tgcalls = new BaseTGCalls(null);
-      tgcalls.joinVoiceCall = async (payload) =>
-        JSON.parse(
-          await this.connection.dispatch("joinCall", {
-            chatId,
-            isChat,
-            accessHash,
-            payload,
-          }),
-        );
+      tgcalls.joinVoiceCall = async (payload) => {
+        try {
+          return JSON.parse(
+            await this.connection.dispatch("joinCall", {
+              chatId,
+              isChat,
+              accessHash,
+              payload,
+            }),
+          );
+        } catch (err) {
+          this.stop(chatId);
+          throw err;
+        }
+      };
       const stream = new Stream(readable);
       stream.on("finish", () => {
         this.connection.dispatch("finish", { chatId });
