@@ -2,28 +2,24 @@
 
 import { accessSync, constants } from "fs";
 
-import { Calls } from "./calls";
+import { Call } from "./call";
 import { Connection } from "./connection";
 
 const connection = new Connection(process.stdin, process.stdout);
-const calls = new Calls(connection);
+const call = new Call(connection);
 
 connection.handle("stream", async ({ params }) => {
   accessSync(params.file, constants.R_OK);
-  await calls.stream(
-    params.id,
-    params.file,
-    params.joinCallParams,
-  );
+  await call.stream(params.file);
   return true;
 });
 
-connection.handle("mute", ({ params: { id } }) => calls.mute(id));
+connection.handle("mute", () => call.mute());
 
-connection.handle("unmute", ({ params: { id } }) => calls.unmute(id));
+connection.handle("unmute", () => call.unmute());
 
-connection.handle("pause", ({ params: { id } }) => calls.pause(id));
+connection.handle("pause", () => call.pause());
 
-connection.handle("resume", ({ params: { id } }) => calls.resume(id));
+connection.handle("resume", () => call.resume());
 
-connection.handle("stop", ({ params: { id } }) => calls.stop(id));
+connection.handle("stop", () => call.stop());
