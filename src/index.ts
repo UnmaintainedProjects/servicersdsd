@@ -12,9 +12,8 @@ connection.handle("stream", async ({ params }) => {
   accessSync(params.file, constants.R_OK);
   await calls.stream(
     params.chatId,
-    params.isChat,
     params.file,
-    params.accessHash,
+    params.joinCallParams,
   );
   return true;
 });

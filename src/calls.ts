@@ -14,15 +14,15 @@ enum Result {
 
 export class Calls {
   private instances = new Map<
-    number,
+    string,
     { tgcalls: BaseTGCalls<null>; stream: Stream; track: MediaStreamTrack }
   >();
 
   constructor(private connection: Connection) {}
 
-  stream(chatId: number, isChat: boolean, file: string, accessHash?: number) {
+  stream(id: string, file: string, joinCallParams?: any) {
     const readable = createReadStream(file);
-    const instance = this.instances.get(chatId);
+    const instance = this.instances.get(id);
     if (instance) {
       instance.stream.stop();
       instance.stream.setReadable(readable);
@@ -32,29 +32,28 @@ export class Calls {
         try {
           return JSON.parse(
             await this.connection.dispatch("joinCall", {
-              chatId,
-              isChat,
-              accessHash,
+              id,
               payload,
+              joinCallParams,
             }),
           );
         } catch (err) {
-          this.stop(chatId);
+          this.stop(id);
           throw err;
         }
       };
       const stream = new Stream(readable);
       stream.on("finish", () => {
-        this.connection.dispatch("finish", { chatId });
+        this.connection.dispatch("finish", { id });
       });
       const track = stream.createTrack();
-      this.instances.set(chatId, { tgcalls, stream, track });
+      this.instances.set(id, { tgcalls, stream, track });
       return tgcalls.start(track);
     }
   }
 
-  mute(chatId: number) {
-    const instance = this.instances.get(chatId);
+  mute(id: string) {
+    const instance = this.instances.get(id);
     if (instance) {
       if (instance.track.enabled) {
         instance.track.enabled = false;
@@ -65,8 +64,8 @@ export class Calls {
     return Result.NOT_IN_CALL;
   }
 
-  unmute(chatId: number) {
-    const instance = this.instances.get(chatId);
+  unmute(id: string) {
+    const instance = this.instances.get(id);
     if (instance) {
       if (!instance.track.enabled) {
         instance.track.enabled = true;
@@ -77,8 +76,8 @@ export class Calls {
     return Result.NOT_IN_CALL;
   }
 
-  resume(chatId: number) {
-    const instance = this.instances.get(chatId);
+  resume(id: string) {
+    const instance = this.instances.get(id);
     if (instance) {
       if (instance.stream.paused) {
         instance.stream.pause();
@@ -89,8 +88,8 @@ export class Calls {
     return Result.NOT_IN_CALL;
   }
 
-  pause(chatId: number) {
-    const instance = this.instances.get(chatId);
+  pause(id: string) {
+    const instance = this.instances.get(id);
     if (instance) {
       if (!instance.stream.paused) {
         instance.stream.pause();
@@ -101,12 +100,12 @@ export class Calls {
     return Result.NOT_IN_CALL;
   }
 
-  stop(chatId: number) {
-    const instance = this.instances.get(chatId);
+  stop(id: string) {
+    const instance = this.instances.get(id);
     if (instance) {
       instance.stream.stop();
       instance.tgcalls.close();
-      this.instances.delete(chatId);
+      this.instances.delete(id);
       return true;
     }
     return false;
