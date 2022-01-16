@@ -39,8 +39,8 @@ export class Connection {
     this.output.write(JSON.stringify(response) + "\n");
   }
 
-  handle(event: string, handler: Handler) {
-    this.handlers.set(event, handler);
+  handle(method: string, handler: Handler) {
+    this.handlers.set(method, handler);
   }
 
   private async handleChunk(chunk: string) {

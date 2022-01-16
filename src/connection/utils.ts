@@ -2,7 +2,7 @@ import { randomInt } from "crypto";
 import { Request, Response } from "./types";
 
 export function isRequest(data: any): data is Request {
-  return typeof data.id === "string" && typeof data.event === "string" &&
+  return typeof data.id === "string" && typeof data.method === "string" &&
     typeof data.params === "object";
 }
 
