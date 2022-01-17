@@ -22,4 +22,6 @@ connection.handle("pause", () => call.pause());
 
 connection.handle("resume", () => call.resume());
 
+connection.handle("finish", () => call.finish());
+
 connection.handle("stop", () => call.stop());

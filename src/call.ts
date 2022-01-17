@@ -94,6 +94,17 @@ export class Call {
     return Result.NOT_IN_CALL;
   }
 
+  finish() {
+    if (this.instances) {
+      if (!this.instances.stream.finished) {
+        this.instances.stream.finish();
+        return Result.OK;
+      }
+      return Result.NOT_STREAMING;
+    }
+    return Result.NOT_IN_CALL;
+  }
+
   stop() {
     if (this.instances) {
       this.instances.stream.stop();
