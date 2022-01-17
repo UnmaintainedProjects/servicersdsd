@@ -19,12 +19,11 @@ export class Call {
     track: MediaStreamTrack;
   };
 
-  constructor(private connection: Connection) {}
+  constructor(private connection: Connection) { }
 
   stream(file: string) {
     const readable = createReadStream(file);
     if (this.instances) {
-      this.instances.stream.stop();
       this.instances.stream.setReadable(readable);
     } else {
       const tgcalls = new BaseTGCalls(null);
