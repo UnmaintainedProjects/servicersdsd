@@ -20,18 +20,11 @@ export class Call {
 
   constructor(private connection: Connection) {}
 
-  stream({ audio, video }: { audio?: string; video?: string }) {
+  async stream({ audio, video }: { audio?: string; video?: string }) {
     if (!audio && !video) {
       throw new Error("No audio or video passed");
     }
-    if (this.instances) {
-      if (audio) {
-        this.instances.stream.setAudio(createReadStream(audio));
-      }
-      if (video) {
-        this.instances.stream.setVideo(createReadStream(video));
-      }
-    } else {
+    if (!this.instances) {
       const tgcalls = new TGCalls(null);
       tgcalls.joinVoiceCall = async (payload) => {
         try {
@@ -50,7 +43,14 @@ export class Call {
         this.connection.dispatch("finish");
       });
       this.instances = { tgcalls, stream };
-      return tgcalls.start(stream);
+      await tgcalls.start(stream);
+    }
+
+    if (audio) {
+      this.instances.stream.setAudio(createReadStream(audio));
+    }
+    if (video) {
+      this.instances.stream.setVideo(createReadStream(video));
     }
   }
 
