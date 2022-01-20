@@ -1,5 +1,5 @@
 import { createReadStream } from "fs";
-import { BaseTGCalls, Stream } from "tgcalls-next/lib/base_tgcalls";
+import { TGCalls, Stream } from "tgcalls-next";
 
 import { Connection } from "./connection/connection";
 
@@ -14,45 +14,49 @@ enum Result {
 
 export class Call {
   private instances?: {
-    tgcalls: BaseTGCalls<null>;
+    tgcalls: TGCalls<null>;
     stream: Stream;
-    track: MediaStreamTrack;
   };
 
-  constructor(private connection: Connection) { }
+  constructor(private connection: Connection) {}
 
-  stream(file: string) {
-    const readable = createReadStream(file);
+  stream({ audio, video }: { audio?: string; video?: string }) {
+    if (!audio && !video) {
+      throw new Error("No audio or video passed");
+    }
     if (this.instances) {
-      this.instances.stream.setReadable(readable);
+      if (audio) {
+        this.instances.stream.setAudio(createReadStream(audio));
+      }
+      if (video) {
+        this.instances.stream.setVideo(createReadStream(video));
+      }
     } else {
-      const tgcalls = new BaseTGCalls(null);
+      const tgcalls = new TGCalls(null);
       tgcalls.joinVoiceCall = async (payload) => {
         try {
           return JSON.parse(
             await this.connection.dispatch("joinCall", {
               payload,
-            }),
+            })
           );
         } catch (err) {
           this.stop();
           throw err;
         }
       };
-      const stream = new Stream(readable);
+      const stream = new Stream();
       stream.on("finish", () => {
         this.connection.dispatch("finish");
       });
-      const track = stream.createTrack();
-      this.instances = { tgcalls, stream, track };
-      return tgcalls.start(track);
+      this.instances = { tgcalls, stream };
+      return tgcalls.start(stream);
     }
   }
 
   mute() {
     if (this.instances) {
-      if (this.instances.track.enabled) {
-        this.instances.track.enabled = false;
+      if (this.instances.stream.mute()) {
         return Result.OK;
       }
       return Result.ALREADY_MUTED;
@@ -62,8 +66,7 @@ export class Call {
 
   unmute() {
     if (this.instances) {
-      if (!this.instances.track.enabled) {
-        this.instances.track.enabled = true;
+      if (!this.instances.stream.unmute()) {
         return Result.OK;
       }
       return Result.NOT_MUTED;
@@ -73,8 +76,7 @@ export class Call {
 
   resume() {
     if (this.instances) {
-      if (this.instances.stream.paused) {
-        this.instances.stream.pause();
+      if (this.instances.stream.resume()) {
         return Result.OK;
       }
       return Result.NOT_PAUSED;
@@ -84,8 +86,7 @@ export class Call {
 
   pause() {
     if (this.instances) {
-      if (!this.instances.stream.paused) {
-        this.instances.stream.pause();
+      if (!this.instances.stream.pause()) {
         return Result.OK;
       }
       return Result.NOT_STREAMING;
