@@ -8,11 +8,19 @@ import { Connection } from "./connection";
 const connection = new Connection(process.stdin, process.stdout);
 const call = new Call(connection);
 
-connection.handle("stream", async ({ params }) => {
-  accessSync(params.file, constants.R_OK);
-  await call.stream(params.file);
-  return true;
-});
+connection.handle(
+  "stream",
+  async ({ params }: { params: { audio?: string; video?: string } }) => {
+    if (params.audio) {
+      accessSync(params.audio, constants.R_OK);
+    }
+    if (params.video) {
+      accessSync(params.video, constants.R_OK);
+    }
+    await call.stream(params);
+    return true;
+  }
+);
 
 connection.handle("mute", () => call.mute());
 
